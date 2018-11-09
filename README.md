@@ -2,12 +2,12 @@
 ZFCChainedCreater的使用
 =
 这是一个将UI的创建转成链式调用，包含UIView、UILabel、UIImageView、UIButton、UITextField、UITextView、UITableView、UICollectionView这些常用控件的创建；还可以将tableView、collectionView的使用转成链式调用，不用再每次写复杂的代理；而且还支持复杂tableView的抽离，使用起来不仅方便简洁，代码可维护性大大提高。
-#1. 导入方式：
-##1.1 直接将ZFCChainedCreater这个文件拖入工程直接使用
-##1.2 通过cocoapod导入 pod 'ZFCChainedCreater'
+# 1. 导入方式：
+## 1.1 直接将ZFCChainedCreater这个文件拖入工程直接使用
+## 1.2 通过cocoapod导入 pod 'ZFCChainedCreater'
 
-#2. 基本使用如下：
-##2.1 常用控件链式创建
+# 2. 基本使用如下：
+## 2.1 常用控件链式创建
 //view
 UIView *chainedView = [UIView ZFC_ViewChainedCreater:^(ZFC_ViewChainedCreater *creater) {
 creater.backgroundColor([UIColor cyanColor])
@@ -129,77 +129,79 @@ creater.layout_minimumLineSpacing(10)
 }];
 
 
-3. tableView/collectionView的链式调用
-3.1 tableView的链式调用
-__block BOOL isXIB = YES;
-ZFC_TableViewConfig *tableViewConfig = [ZFC_TableViewConfig new];
-tableViewConfig.tableView = self.tableView;
-tableViewConfig.isCellXib = isXIB;
-tableViewConfig.cellClass = [getClassFromClassString(@"ZFC_TableViewCell", isXIB) class];
-tableViewConfig.isSectionHeaderXib = isXIB;
-tableViewConfig.sectionHeaderClass = [getClassFromClassString(@"ZFC_TableViewHeaderFooterView", isXIB) class];
-tableViewConfig.isSectionFooterXib = isXIB;
-tableViewConfig.sectionFooterClass = [getClassFromClassString(@"ZFC_TableViewHeaderFooterView", isXIB) class];
-tableViewConfig.canDelete = YES;
-__weak typeof(self)weakSelf = self;
-[self.tableView configure:^(ZFC_TableViewChainedInvokeCreater *creater) {
-typeof(weakSelf)strongSelf = weakSelf;//此处一定要这么写
+# 3. tableView/collectionView的链式调用
+## 3.1 tableView的链式调用
+```
+  __block BOOL isXIB = YES;
+    ZFC_TableViewConfig *tableViewConfig = [ZFC_TableViewConfig new];
+    tableViewConfig.tableView = self.tableView;
+    tableViewConfig.isCellXib = isXIB;
+    tableViewConfig.cellClass = [getClassFromClassString(@"ZFC_TableViewCell", isXIB) class];
+    tableViewConfig.isSectionHeaderXib = isXIB;
+    tableViewConfig.sectionHeaderClass = [getClassFromClassString(@"ZFC_TableViewHeaderFooterView", isXIB) class];
+    tableViewConfig.isSectionFooterXib = isXIB;
+    tableViewConfig.sectionFooterClass = [getClassFromClassString(@"ZFC_TableViewHeaderFooterView", isXIB) class];
+    tableViewConfig.canDelete = YES;
+    __weak typeof(self)weakSelf = self;
+    [self.tableView configure:^(ZFC_TableViewChainedInvokeCreater *creater) {
+        
+        creater.zfc_tableViewConfigure(tableViewConfig)
 
-creater.zfc_tableViewConfigure(tableViewConfig)
+    .zfc_numberOfSectionsInTableView(^NSInteger(UITableView *tableView){
+         return 3;
+    })
+    .zfc_numberOfRowsInSection(^NSInteger(UITableView *tableView,NSInteger section) {
+         return strongSelf.dataSource.count; 
+    })
+    .zfc_heightForRowAtIndexPath(^CGFloat(UITableView *tableView,NSIndexPath *indexPath) {
 
-.zfc_numberOfSectionsInTableView(^NSInteger(UITableView *tableView){
-return 3;
-})
-.zfc_numberOfRowsInSection(^NSInteger(UITableView *tableView,NSInteger section) {
-return strongSelf.dataSource.count; 
-})
-.zfc_heightForRowAtIndexPath(^CGFloat(UITableView *tableView,NSIndexPath *indexPath) {
+         return 50;
+    })
+    .zfc_cellForRowAtIndexPath(^(UITableView *tableView,__kindof ZFC_TableViewCell *cell, NSIndexPath *indexPath) {
 
-return 50;
-})
-.zfc_cellForRowAtIndexPath(^(UITableView *tableView,__kindof ZFC_TableViewCell *cell, NSIndexPath *indexPath) {
+         cell.myLabel.text = [NSString stringWithFormat:@"%@%@",strongSelf.dataSource[indexPath.row],isXIB?@"->XIB":@""];
 
-cell.myLabel.text = [NSString stringWithFormat:@"%@%@",strongSelf.dataSource[indexPath.row],isXIB?@"->XIB":@""];
+         cell.contentView.backgroundColor = [UIColor grayColor];
 
-cell.contentView.backgroundColor = [UIColor grayColor];
+    })
+    .zfc_heightForHeaderInSection(^CGFloat(UITableView *tableView,NSInteger section) {
 
-})
-.zfc_heightForHeaderInSection(^CGFloat(UITableView *tableView,NSInteger section) {
+         return 40;
+    })
+    .zfc_viewForHeaderInSection(^(UITableView *tableView,__kindof ZFC_TableViewHeaderFooterView *headerView,NSInteger section) {
 
-return 40;
-})
-.zfc_viewForHeaderInSection(^(UITableView *tableView,__kindof ZFC_TableViewHeaderFooterView *headerView,NSInteger section) {
+          headerView.myLabel.text = [NSString stringWithFormat:@"我是第-- %ld --段头%@",section,isXIB?@"->XIB":@""];
 
-headerView.myLabel.text = [NSString stringWithFormat:@"我是第-- %ld --段头%@",section,isXIB?@"->XIB":@""];
+          headerView.contentView.backgroundColor = [UIColor yellowColor];
+    })
+    .zfc_heightForFooterInSection(^CGFloat(UITableView *tableView,NSInteger section) {
 
-headerView.contentView.backgroundColor = [UIColor yellowColor];
-})
-.zfc_heightForFooterInSection(^CGFloat(UITableView *tableView,NSInteger section) {
+          return 40;
 
-return 40;
+    }).zfc_viewForFooterInSection(^(UITableView *tableView,__kindof ZFC_TableViewHeaderFooterView *footerView,NSInteger section) {
 
-}).zfc_viewForFooterInSection(^(UITableView *tableView,__kindof ZFC_TableViewHeaderFooterView *footerView,NSInteger section) {
+           footerView.myLabel.text = [NSString stringWithFormat:@"我是第-- %ld --段尾%@",section,isXIB?@"->XIB":@""];
+           footerView.contentView.backgroundColor = [UIColor blueColor];
 
-footerView.myLabel.text = [NSString stringWithFormat:@"我是第-- %ld --段尾%@",section,isXIB?@"->XIB":@""];
-footerView.contentView.backgroundColor = [UIColor blueColor];
+    })
+    .zfc_deleteCellWithIndexPath(^(UITableView *tableView, NSIndexPath *indexPath) {
+    NSLog(@"删除");
+    [strongSelf.dataSource removeLastObject];
+    [tableView reloadData];
+    })
+    .zfc_didSelectRowAtIndexPath(^(UITableView *tableView,NSIndexPath *indexPath) {
+    NSLog(@"我点击了%@",strongSelf.dataSource[indexPath.row]);
+    });
+    }];
 
-})
-.zfc_deleteCellWithIndexPath(^(UITableView *tableView, NSIndexPath *indexPath) {
-NSLog(@"删除");
-[strongSelf.dataSource removeLastObject];
-[tableView reloadData];
-})
-.zfc_didSelectRowAtIndexPath(^(UITableView *tableView,NSIndexPath *indexPath) {
-NSLog(@"我点击了%@",strongSelf.dataSource[indexPath.row]);
-});
-}];
-
-dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-for(NSInteger i = 2; i < 5; i++) {
-[self.dataSource addObject:[NSString stringWithFormat:@"测试:%ld",i]];
-}
-[self.tableView.creater zfc_reloadData];
-});
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    for(NSInteger i = 2; i < 5; i++) {
+    [self.dataSource addObject:[NSString stringWithFormat:@"测试:%ld",i]];
+    }
+    [self.tableView.creater zfc_reloadData];
+    });
+```
+    
 
 3.2 collectionView的链式调用
 __block BOOL isXIB = YES;
