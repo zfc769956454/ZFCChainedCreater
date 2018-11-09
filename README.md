@@ -3,8 +3,8 @@ ZFCChainedCreater的使用
 =
 这是一个将UI的创建转成链式调用，包含UIView、UILabel、UIImageView、UIButton、UITextField、UITextView、UITableView、UICollectionView这些常用控件的创建；还可以将tableView、collectionView的使用转成链式调用，不用再每次写复杂的代理；而且还支持复杂tableView的抽离，使用起来不仅方便简洁，代码可维护性大大提高。
 # 1. 导入方式：
-## 1.1 直接将ZFCChainedCreater这个文件拖入工程直接使用
-## 1.2 通过cocoapod导入 pod 'ZFCChainedCreater'
+1.1 直接将ZFCChainedCreater这个文件拖入工程直接使用
+1.2 通过cocoapod导入 pod 'ZFCChainedCreater'
 
 # 2. 基本使用如下：
 ## 2.1 常用控件链式创建
