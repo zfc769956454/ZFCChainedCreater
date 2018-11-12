@@ -204,7 +204,7 @@ ZFCChainedCreater的使用
 ```
     
 
-3.2 collectionView的链式调用
+## 3.2 collectionView的链式调用
 ```
     __block BOOL isXIB = YES;
     collectionViewConfig.isCellXib = isXIB;
