@@ -19,5 +19,6 @@
 #import "ZFC_CollectionChainedCreater.h"
 #import "UITableView+ZFC_ChainedInvokeCreater.h"
 #import "UICollectionView+ZFCChainedInvokeCreater.h"
+#import "ZFC_TableViewComplexConfig.h"
 
 #endif /* ZFC_ChainedCreaterHeader_h */
